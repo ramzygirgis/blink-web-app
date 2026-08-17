@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blink Reminder</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Blink Reminder</h1>
+      <p id="status">Requesting camera access…</p>
+      <video id="camera-feed" autoplay playsinline muted></video>
+      <div id="blendshapes">
+        <div class="blink-meter">
+          <label for="blink-left">Left eye blink</label>
+          <progress id="blink-left" max="1" value="0"></progress>
+          <span id="blink-left-value">0.00</span>
+        </div>
+        <div class="blink-meter">
+          <label for="blink-right">Right eye blink</label>
+          <progress id="blink-right" max="1" value="0"></progress>
+          <span id="blink-right-value">0.00</span>
+        </div>
+        <div class="blink-meter">
+          <label for="blink-combined">Combined (min)</label>
+          <progress id="blink-combined" max="1" value="0"></progress>
+          <span id="blink-combined-value">0.00</span>
+        </div>
+      </div>
+      <p id="blink-stats">State: open — Blinks: 0</p>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
