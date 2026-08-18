@@ -59,7 +59,7 @@ function updateBlendshapes(result: FaceLandmarkerResult, timestampMs: number): v
   const categories = result.faceBlendshapes[0]?.categories ?? [];
   const left = categories.find((c) => c.categoryName === "eyeBlinkLeft")?.score ?? 0;
   const right = categories.find((c) => c.categoryName === "eyeBlinkRight")?.score ?? 0;
-  const combined = Math.min(left, right);
+  const combined = Math.max(0, Math.min(left, right) - Math.abs(left - right));
 
   blinkLeftBar.value = left;
   blinkRightBar.value = right;
