@@ -44,6 +44,26 @@ h1 {
   margin-bottom: 16px;
 }
 
+#start-button {
+  font: inherit;
+  padding: 8px 20px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+#start-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+#alert-status {
+  margin-top: 8px;
+}
+
 #camera-feed {
   width: 100%;
   max-width: 640px;

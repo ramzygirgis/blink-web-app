@@ -7,9 +7,9 @@ export interface BlinkDetectorOptions {
 }
 
 export const DEFAULT_BLINK_DETECTOR_OPTIONS: BlinkDetectorOptions = {
-  enterClosedThreshold: 0.75,
+  enterClosedThreshold: 0.70,
   exitClosedThreshold: 0.4,
-  minClosedDurationMs: 100,
+  minClosedDurationMs: 50,
 };
 
 export class BlinkDetector {

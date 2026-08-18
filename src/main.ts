@@ -3,7 +3,10 @@ import type { FaceLandmarker, FaceLandmarkerResult } from "@mediapipe/tasks-visi
 import { startCamera } from "./camera";
 import { createFaceLandmarker } from "./faceLandmarker";
 import { BlinkDetector, DEFAULT_BLINK_DETECTOR_OPTIONS } from "./blinkDetector";
+import { AlertPlayer } from "./alertPlayer";
+import { AlertScheduler, DEFAULT_ALERT_STAGES } from "./alertScheduler";
 
+const startButton = document.querySelector<HTMLButtonElement>("#start-button")!;
 const statusEl = document.querySelector<HTMLParagraphElement>("#status")!;
 const videoEl = document.querySelector<HTMLVideoElement>("#camera-feed")!;
 const blinkLeftBar = document.querySelector<HTMLProgressElement>("#blink-left")!;
@@ -13,9 +16,20 @@ const blinkRightValue = document.querySelector<HTMLSpanElement>("#blink-right-va
 const blinkCombinedBar = document.querySelector<HTMLProgressElement>("#blink-combined")!;
 const blinkCombinedValue = document.querySelector<HTMLSpanElement>("#blink-combined-value")!;
 const blinkStatsEl = document.querySelector<HTMLParagraphElement>("#blink-stats")!;
+const alertStatusEl = document.querySelector<HTMLParagraphElement>("#alert-status")!;
 
 const blinkDetector = new BlinkDetector(DEFAULT_BLINK_DETECTOR_OPTIONS);
+const alertPlayer = new AlertPlayer();
+const alertScheduler = new AlertScheduler(DEFAULT_ALERT_STAGES);
 let blinkCount = 0;
+let lastFrameMs: number | null = null;
+let elapsedSinceBlinkMs = 0;
+
+startButton.addEventListener("click", () => {
+  alertPlayer.unlock();
+  startButton.disabled = true;
+  main();
+});
 
 async function main() {
   try {
@@ -29,6 +43,7 @@ async function main() {
     detectLoop(faceLandmarker);
   } catch (err) {
     statusEl.textContent = describeError(err);
+    startButton.disabled = false;
   }
 }
 
@@ -39,20 +54,22 @@ function waitForVideoReady(video: HTMLVideoElement): Promise<void> {
   });
 }
 
+const DETECTION_INTERVAL_MS = 33;
+
 function detectLoop(faceLandmarker: FaceLandmarker): void {
   let lastVideoTime = -1;
 
-  function tick() {
+  // setInterval instead of requestAnimationFrame: rAF is tied to painting and
+  // gets suspended in background tabs, which would silently stop blink
+  // detection whenever this tab isn't focused.
+  setInterval(() => {
     if (videoEl.currentTime !== lastVideoTime) {
       lastVideoTime = videoEl.currentTime;
       const now = performance.now();
       const result = faceLandmarker.detectForVideo(videoEl, now);
       updateBlendshapes(result, now);
     }
-    requestAnimationFrame(tick);
-  }
-
-  requestAnimationFrame(tick);
+  }, DETECTION_INTERVAL_MS);
 }
 
 function updateBlendshapes(result: FaceLandmarkerResult, timestampMs: number): void {
@@ -70,12 +87,27 @@ function updateBlendshapes(result: FaceLandmarkerResult, timestampMs: number): v
 
   statusEl.textContent = categories.length > 0 ? "Face detected." : "No face detected.";
 
+  const frameDelta = lastFrameMs === null ? 0 : timestampMs - lastFrameMs;
+  lastFrameMs = timestampMs;
+
   if (categories.length > 0) {
+    elapsedSinceBlinkMs += frameDelta;
+
     const blinked = blinkDetector.update(combined, timestampMs);
-    if (blinked) blinkCount++;
+    if (blinked) {
+      blinkCount++;
+      elapsedSinceBlinkMs = 0;
+      alertScheduler.reset();
+    }
+
+    const stage = alertScheduler.update(elapsedSinceBlinkMs, timestampMs);
+    if (stage) {
+      alertPlayer.playBeeps(stage.beepCount, stage.frequencyHz, stage.volume);
+    }
   }
 
   blinkStatsEl.textContent = `State: ${blinkDetector.getState()} — Blinks: ${blinkCount}`;
+  alertStatusEl.textContent = `Time since last blink: ${(elapsedSinceBlinkMs / 1000).toFixed(1)}s`;
 }
 
 function describeError(err: unknown): string {
@@ -93,5 +125,3 @@ function describeError(err: unknown): string {
   }
   return "Something went wrong loading the camera or face model.";
 }
-
-main();
