@@ -26,16 +26,10 @@ const views: Record<string, HTMLElement> = {
 
 const enterThresholdInput = document.querySelector<HTMLInputElement>("#setting-enter-threshold")!;
 const enterThresholdValue = document.querySelector<HTMLSpanElement>("#setting-enter-threshold-value")!;
-const exitThresholdInput = document.querySelector<HTMLInputElement>("#setting-exit-threshold")!;
-const exitThresholdValue = document.querySelector<HTMLSpanElement>("#setting-exit-threshold-value")!;
 const minDurationInput = document.querySelector<HTMLInputElement>("#setting-min-duration")!;
 const minDurationValue = document.querySelector<HTMLSpanElement>("#setting-min-duration-value")!;
-const stage1Input = document.querySelector<HTMLInputElement>("#setting-stage1")!;
-const stage1Value = document.querySelector<HTMLSpanElement>("#setting-stage1-value")!;
-const stage2Input = document.querySelector<HTMLInputElement>("#setting-stage2")!;
-const stage2Value = document.querySelector<HTMLSpanElement>("#setting-stage2-value")!;
-const stage3Input = document.querySelector<HTMLInputElement>("#setting-stage3")!;
-const stage3Value = document.querySelector<HTMLSpanElement>("#setting-stage3-value")!;
+const alertDelayInput = document.querySelector<HTMLInputElement>("#setting-alert-delay")!;
+const alertDelayValue = document.querySelector<HTMLSpanElement>("#setting-alert-delay-value")!;
 const volumeInput = document.querySelector<HTMLInputElement>("#setting-volume")!;
 const volumeValue = document.querySelector<HTMLSpanElement>("#setting-volume-value")!;
 const showCameraInput = document.querySelector<HTMLInputElement>("#setting-show-camera")!;
@@ -76,44 +70,40 @@ tabButtons.forEach((button) => {
 
 function applyBlinkDetectorSettings(): void {
   const enter = Number(enterThresholdInput.value);
-  const exit = Number(exitThresholdInput.value);
   const minDuration = Number(minDurationInput.value);
 
   enterThresholdValue.textContent = enter.toFixed(2);
-  exitThresholdValue.textContent = exit.toFixed(2);
   minDurationValue.textContent = String(minDuration);
 
   blinkDetector.setOptions({
     enterClosedThreshold: enter,
-    exitClosedThreshold: exit,
+    exitClosedThreshold: DEFAULT_BLINK_DETECTOR_OPTIONS.exitClosedThreshold,
     minClosedDurationMs: minDuration,
   });
 }
 
 function applyAlertSettings(): void {
-  const afterMsValues = [Number(stage1Input.value), Number(stage2Input.value), Number(stage3Input.value)]
-    .map((seconds) => seconds * 1000)
-    .sort((a, b) => a - b);
+  const baseAfterMs = Number(alertDelayInput.value) * 1000;
   const volumeMultiplier = Number(volumeInput.value);
 
-  stage1Value.textContent = stage1Input.value;
-  stage2Value.textContent = stage2Input.value;
-  stage3Value.textContent = stage3Input.value;
+  alertDelayValue.textContent = alertDelayInput.value;
   volumeValue.textContent = `${Math.round(volumeMultiplier * 100)}%`;
 
-  const stages = DEFAULT_ALERT_STAGES.map((stage, i) => ({
+  // Stage 2/3 stay at their default fixed offsets from stage 1, so the whole
+  // escalation sequence shifts together instead of exposing three sliders.
+  const stages = DEFAULT_ALERT_STAGES.map((stage) => ({
     ...stage,
-    afterMs: afterMsValues[i],
+    afterMs: baseAfterMs + (stage.afterMs - DEFAULT_ALERT_STAGES[0].afterMs),
     volume: stage.volume * volumeMultiplier,
   }));
 
   alertScheduler.setStages(stages);
 }
 
-for (const input of [enterThresholdInput, exitThresholdInput, minDurationInput]) {
+for (const input of [enterThresholdInput, minDurationInput]) {
   input.addEventListener("input", applyBlinkDetectorSettings);
 }
-for (const input of [stage1Input, stage2Input, stage3Input, volumeInput]) {
+for (const input of [alertDelayInput, volumeInput]) {
   input.addEventListener("input", applyAlertSettings);
 }
 
@@ -131,13 +121,10 @@ resetCancelButton.addEventListener("click", () => {
 
 resetConfirmButton.addEventListener("click", () => {
   enterThresholdInput.value = String(DEFAULT_BLINK_DETECTOR_OPTIONS.enterClosedThreshold);
-  exitThresholdInput.value = String(DEFAULT_BLINK_DETECTOR_OPTIONS.exitClosedThreshold);
   minDurationInput.value = String(DEFAULT_BLINK_DETECTOR_OPTIONS.minClosedDurationMs);
   applyBlinkDetectorSettings();
 
-  stage1Input.value = String(DEFAULT_ALERT_STAGES[0].afterMs / 1000);
-  stage2Input.value = String(DEFAULT_ALERT_STAGES[1].afterMs / 1000);
-  stage3Input.value = String(DEFAULT_ALERT_STAGES[2].afterMs / 1000);
+  alertDelayInput.value = String(DEFAULT_ALERT_STAGES[0].afterMs / 1000);
   volumeInput.value = "1";
   applyAlertSettings();
 
