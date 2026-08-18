@@ -52,7 +52,6 @@ let lastFrameMs: number | null = null;
 let elapsedSinceBlinkMs = 0;
 
 let faceLandmarkerInstance: FaceLandmarker | null = null;
-let mediaStream: MediaStream | null = null;
 let detectionIntervalId: number | null = null;
 let isMonitoring = false;
 
@@ -151,19 +150,22 @@ resetConfirmButton.addEventListener("click", () => {
 async function startMonitoring() {
   try {
     startButton.disabled = true;
-    statusEl.textContent = "Requesting camera access…";
+
+    // Once the camera's been granted, it stays attached across pauses — only
+    // request it the first time, so resuming is instant.
+    const needsCamera = videoEl.srcObject === null;
+    if (needsCamera) statusEl.textContent = "Requesting camera access…";
 
     const landmarkerPromise = faceLandmarkerInstance
       ? Promise.resolve(faceLandmarkerInstance)
       : createFaceLandmarker();
+    const cameraPromise = needsCamera
+      ? startCamera(videoEl).then(() => waitForVideoReady(videoEl))
+      : Promise.resolve();
 
-    const [, faceLandmarker] = await Promise.all([
-      startCamera(videoEl).then(() => waitForVideoReady(videoEl)),
-      landmarkerPromise,
-    ]);
+    const [, faceLandmarker] = await Promise.all([cameraPromise, landmarkerPromise]);
 
     faceLandmarkerInstance = faceLandmarker;
-    mediaStream = videoEl.srcObject as MediaStream;
     isMonitoring = true;
     startButton.textContent = "Pause monitoring";
     startButton.disabled = false;
@@ -183,27 +185,22 @@ function pauseMonitoring(): void {
     detectionIntervalId = null;
   }
 
-  if (mediaStream) {
-    for (const track of mediaStream.getTracks()) track.stop();
-    mediaStream = null;
-  }
-  videoEl.srcObject = null;
-
+  // Camera stays on — only detection/alerting pauses. Blink count freezes at
+  // its current value (same as a no-face frame); the timer resets to 0,
+  // which is the one deliberate difference from the no-face-detected case.
   blinkDetector.reset();
   alertScheduler.reset();
-  blinkCount = 0;
   lastFrameMs = null;
   elapsedSinceBlinkMs = 0;
 
   startButton.textContent = "Start monitoring";
-  statusEl.textContent = 'Click "Start monitoring" to begin.';
+  statusEl.textContent = "Monitoring paused.";
   blinkLeftBar.value = 0;
   blinkRightBar.value = 0;
   blinkCombinedBar.value = 0;
   blinkLeftValue.textContent = "0.00";
   blinkRightValue.textContent = "0.00";
   blinkCombinedValue.textContent = "0.00";
-  blinkCountValueEl.textContent = "0";
   timeSinceBlinkValueEl.textContent = "0.0s";
 }
 
