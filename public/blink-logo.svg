@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="72" viewBox="0 0 200 72" role="img" aria-label="Blink logo">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500&amp;display=swap');
+      .wordmark { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 500; letter-spacing: -0.5px; fill: #FFFFFF; }
+    </style>
+  </defs>
+  <circle cx="36" cy="36" r="34" fill="#FFFFFF"/>
+  <path d="M20 28 Q28 21 36 28 Q44 35 52 28" fill="none" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+  <rect x="20" y="37" width="32" height="5" rx="2.5" fill="#2B2B2B"/>
+  <rect x="20" y="46" width="32" height="5" rx="2.5" fill="#2B2B2B"/>
+  <text x="82" y="48" class="wordmark">blink</text>
+</svg>

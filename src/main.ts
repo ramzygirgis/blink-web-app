@@ -5,16 +5,13 @@ import { createFaceLandmarker } from "./faceLandmarker";
 import { BlinkDetector, DEFAULT_BLINK_DETECTOR_OPTIONS } from "./blinkDetector";
 import { AlertPlayer } from "./alertPlayer";
 import { AlertScheduler, DEFAULT_ALERT_STAGES } from "./alertScheduler";
+import { getSensitivityLabel, sensitivityToThreshold, thresholdToSensitivity } from "./sensitivityLabel";
 
 const startButton = document.querySelector<HTMLButtonElement>("#start-button")!;
 const statusEl = document.querySelector<HTMLParagraphElement>("#status")!;
 const videoEl = document.querySelector<HTMLVideoElement>("#camera-feed")!;
-const blinkLeftBar = document.querySelector<HTMLProgressElement>("#blink-left")!;
-const blinkRightBar = document.querySelector<HTMLProgressElement>("#blink-right")!;
-const blinkLeftValue = document.querySelector<HTMLSpanElement>("#blink-left-value")!;
-const blinkRightValue = document.querySelector<HTMLSpanElement>("#blink-right-value")!;
-const blinkCombinedBar = document.querySelector<HTMLProgressElement>("#blink-combined")!;
-const blinkCombinedValue = document.querySelector<HTMLSpanElement>("#blink-combined-value")!;
+const blinkProbabilityBar = document.querySelector<HTMLProgressElement>("#blink-probability")!;
+const blinkProbabilityValue = document.querySelector<HTMLSpanElement>("#blink-probability-value")!;
 const blinkCountValueEl = document.querySelector<HTMLSpanElement>("#blink-count-value")!;
 const timeSinceBlinkValueEl = document.querySelector<HTMLSpanElement>("#time-since-blink-value")!;
 
@@ -24,8 +21,8 @@ const views: Record<string, HTMLElement> = {
   settings: document.querySelector<HTMLElement>("#view-settings")!,
 };
 
-const enterThresholdInput = document.querySelector<HTMLInputElement>("#setting-enter-threshold")!;
-const enterThresholdValue = document.querySelector<HTMLSpanElement>("#setting-enter-threshold-value")!;
+const sensitivityInput = document.querySelector<HTMLInputElement>("#setting-sensitivity")!;
+const sensitivityValue = document.querySelector<HTMLSpanElement>("#setting-sensitivity-value")!;
 const minDurationInput = document.querySelector<HTMLInputElement>("#setting-min-duration")!;
 const minDurationValue = document.querySelector<HTMLSpanElement>("#setting-min-duration-value")!;
 const alertDelayInput = document.querySelector<HTMLInputElement>("#setting-alert-delay")!;
@@ -69,14 +66,14 @@ tabButtons.forEach((button) => {
 });
 
 function applyBlinkDetectorSettings(): void {
-  const enter = Number(enterThresholdInput.value);
+  const sensitivity = Number(sensitivityInput.value);
   const minDuration = Number(minDurationInput.value);
 
-  enterThresholdValue.textContent = enter.toFixed(2);
+  sensitivityValue.textContent = getSensitivityLabel(sensitivity);
   minDurationValue.textContent = String(minDuration);
 
   blinkDetector.setOptions({
-    enterClosedThreshold: enter,
+    enterClosedThreshold: sensitivityToThreshold(sensitivity),
     exitClosedThreshold: DEFAULT_BLINK_DETECTOR_OPTIONS.exitClosedThreshold,
     minClosedDurationMs: minDuration,
   });
@@ -100,7 +97,7 @@ function applyAlertSettings(): void {
   alertScheduler.setStages(stages);
 }
 
-for (const input of [enterThresholdInput, minDurationInput]) {
+for (const input of [sensitivityInput, minDurationInput]) {
   input.addEventListener("input", applyBlinkDetectorSettings);
 }
 for (const input of [alertDelayInput, volumeInput]) {
@@ -120,7 +117,7 @@ resetCancelButton.addEventListener("click", () => {
 });
 
 resetConfirmButton.addEventListener("click", () => {
-  enterThresholdInput.value = String(DEFAULT_BLINK_DETECTOR_OPTIONS.enterClosedThreshold);
+  sensitivityInput.value = String(thresholdToSensitivity(DEFAULT_BLINK_DETECTOR_OPTIONS.enterClosedThreshold));
   minDurationInput.value = String(DEFAULT_BLINK_DETECTOR_OPTIONS.minClosedDurationMs);
   applyBlinkDetectorSettings();
 
@@ -182,12 +179,8 @@ function pauseMonitoring(): void {
 
   startButton.textContent = "Start monitoring";
   statusEl.textContent = "Monitoring paused.";
-  blinkLeftBar.value = 0;
-  blinkRightBar.value = 0;
-  blinkCombinedBar.value = 0;
-  blinkLeftValue.textContent = "0.00";
-  blinkRightValue.textContent = "0.00";
-  blinkCombinedValue.textContent = "0.00";
+  blinkProbabilityBar.value = 0;
+  blinkProbabilityValue.textContent = "0.00";
   timeSinceBlinkValueEl.textContent = "0.0s";
 }
 
@@ -222,12 +215,8 @@ function updateBlendshapes(result: FaceLandmarkerResult, timestampMs: number): v
   const right = categories.find((c) => c.categoryName === "eyeBlinkRight")?.score ?? 0;
   const combined = Math.max(0, Math.min(left, right) - Math.abs(left - right));
 
-  blinkLeftBar.value = left;
-  blinkRightBar.value = right;
-  blinkLeftValue.textContent = left.toFixed(2);
-  blinkRightValue.textContent = right.toFixed(2);
-  blinkCombinedBar.value = combined;
-  blinkCombinedValue.textContent = combined.toFixed(2);
+  blinkProbabilityBar.value = combined;
+  blinkProbabilityValue.textContent = combined.toFixed(2);
 
   const frameDelta = lastFrameMs === null ? 0 : timestampMs - lastFrameMs;
   lastFrameMs = timestampMs;

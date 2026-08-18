@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="/blink-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blink Reminder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,7 +16,19 @@
     <div id="app">
       <aside id="sidebar">
         <div id="logo">
-          <img id="logo-img" src="/dark-logo.png" alt="Blink" />
+          <svg xmlns="http://www.w3.org/2000/svg" width="200" height="72" viewBox="0 0 200 72" role="img" aria-label="Blink logo">
+            <defs>
+              <style>
+                @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500&amp;display=swap');
+                .wordmark { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 500; letter-spacing: -0.5px; fill: #FFFFFF; }
+              </style>
+            </defs>
+            <circle cx="36" cy="36" r="34" fill="#FFFFFF"/>
+            <path d="M20 28 Q28 21 36 28 Q44 35 52 28" fill="none" stroke="#2B2B2B" stroke-width="4" stroke-linecap="round"/>
+            <rect x="20" y="37" width="32" height="5" rx="2.5" fill="#2B2B2B"/>
+            <rect x="20" y="46" width="32" height="5" rx="2.5" fill="#2B2B2B"/>
+            <text x="82" y="48" class="wordmark">blink</text>
+          </svg>
         </div>
 
         <nav id="nav-menu">
@@ -45,19 +57,9 @@
 
         <div id="blendshapes">
           <div class="blink-meter">
-            <label for="blink-left">Left eye blink</label>
-            <progress id="blink-left" max="1" value="0"></progress>
-            <span id="blink-left-value">0.00</span>
-          </div>
-          <div class="blink-meter">
-            <label for="blink-right">Right eye blink</label>
-            <progress id="blink-right" max="1" value="0"></progress>
-            <span id="blink-right-value">0.00</span>
-          </div>
-          <div class="blink-meter">
-            <label for="blink-combined">Combined (min)</label>
-            <progress id="blink-combined" max="1" value="0"></progress>
-            <span id="blink-combined-value">0.00</span>
+            <label for="blink-probability">Blink probability</label>
+            <progress id="blink-probability" max="1" value="0"></progress>
+            <span id="blink-probability-value">0.00</span>
           </div>
         </div>
       </section>
@@ -65,10 +67,10 @@
       <section id="view-settings" class="view" hidden>
         <div class="settings-group">
           <h2>Blink Parameters</h2>
-          <div class="setting-row">
-            <label for="setting-enter-threshold">Blink threshold (enter closed)</label>
-            <input type="range" id="setting-enter-threshold" min="0.6" max="0.8" step="0.01" value="0.70" />
-            <span id="setting-enter-threshold-value">0.70</span>
+          <div class="setting-row setting-row-wide-value">
+            <label for="setting-sensitivity">Blink sensitivity</label>
+            <input type="range" id="setting-sensitivity" min="0" max="100" step="1" value="50" />
+            <span id="setting-sensitivity-value">Mid</span>
           </div>
           <div class="setting-row">
             <label for="setting-min-duration">Minimum blink duration (ms)</label>

@@ -42,11 +42,10 @@ body {
   margin-bottom: 32px;
 }
 
-#logo-img {
+#logo svg {
   display: block;
-  width: 132px;
-  height: 132px;
-  border-radius: 8px;
+  width: 180px;
+  height: auto;
 }
 
 #nav-menu {
@@ -83,6 +82,24 @@ body {
 #main-content > .view {
   max-width: 640px;
   margin: 0 auto;
+}
+
+#view-settings {
+  /* 8vh base buffer, plus the height of the "Blink Parameters" heading
+     (~14px font + 145% line-height + 14px margin) so the group heading
+     lands where the first slider used to sit, not the slider itself. */
+  padding-top: calc(8vh + 34px);
+}
+
+/* Mirrors the sidebar's width as extra right-side padding, so the box
+   .view is centered within is symmetric relative to the whole viewport —
+   otherwise centering "in the leftover space" reads as shifted right.
+   Only kicks in once there's enough width to spare (sidebar + content +
+   mirrored gutter needs ~1180px); below that it just fills the space. */
+@media (min-width: 1200px) {
+  #main-content {
+    padding-right: calc(32px + 270px);
+  }
 }
 
 .view[hidden] {
@@ -164,6 +181,10 @@ dialog#reset-confirm-dialog::backdrop {
 .setting-row span {
   font-size: 14px;
   text-align: right;
+}
+
+.setting-row-wide-value {
+  grid-template-columns: 200px 1fr 100px;
 }
 
 .setting-toggle {
