@@ -5,30 +5,122 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blink Reminder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400..600&display=swap"
+      rel="stylesheet"
+    />
   </head>
   <body>
     <div id="app">
-      <h1>Blink Reminder</h1>
-      <p id="status">Requesting camera access…</p>
-      <video id="camera-feed" autoplay playsinline muted></video>
-      <div id="blendshapes">
-        <div class="blink-meter">
-          <label for="blink-left">Left eye blink</label>
-          <progress id="blink-left" max="1" value="0"></progress>
-          <span id="blink-left-value">0.00</span>
+      <aside id="sidebar">
+        <div id="logo">
+          <img id="logo-img" src="/dark-logo.png" alt="Blink" />
         </div>
-        <div class="blink-meter">
-          <label for="blink-right">Right eye blink</label>
-          <progress id="blink-right" max="1" value="0"></progress>
-          <span id="blink-right-value">0.00</span>
+
+        <nav id="nav-menu">
+          <button class="nav-button" data-view="monitor" type="button" aria-current="true">Monitor</button>
+          <button class="nav-button" data-view="settings" type="button">Settings</button>
+        </nav>
+      </aside>
+
+      <main id="main-content">
+      <section id="view-monitor" class="view">
+        <button id="start-button" type="button">Start monitoring</button>
+        <p id="status">Click "Start monitoring" to begin.</p>
+
+        <div id="stats-row">
+          <div class="stat-tile">
+            <span class="stat-label">Blinks</span>
+            <span class="stat-value" id="blink-count-value">0</span>
+          </div>
+          <div class="stat-tile">
+            <span class="stat-label">Time since last blink</span>
+            <span class="stat-value" id="time-since-blink-value">0.0s</span>
+          </div>
         </div>
-        <div class="blink-meter">
-          <label for="blink-combined">Combined (min)</label>
-          <progress id="blink-combined" max="1" value="0"></progress>
-          <span id="blink-combined-value">0.00</span>
+
+        <video id="camera-feed" autoplay playsinline muted></video>
+
+        <div id="blendshapes">
+          <div class="blink-meter">
+            <label for="blink-left">Left eye blink</label>
+            <progress id="blink-left" max="1" value="0"></progress>
+            <span id="blink-left-value">0.00</span>
+          </div>
+          <div class="blink-meter">
+            <label for="blink-right">Right eye blink</label>
+            <progress id="blink-right" max="1" value="0"></progress>
+            <span id="blink-right-value">0.00</span>
+          </div>
+          <div class="blink-meter">
+            <label for="blink-combined">Combined (min)</label>
+            <progress id="blink-combined" max="1" value="0"></progress>
+            <span id="blink-combined-value">0.00</span>
+          </div>
         </div>
-      </div>
-      <p id="blink-stats">State: open — Blinks: 0</p>
+      </section>
+
+      <section id="view-settings" class="view" hidden>
+        <div class="settings-group">
+          <h2>Blink Parameters</h2>
+          <div class="setting-row">
+            <label for="setting-enter-threshold">Blink threshold (enter closed)</label>
+            <input type="range" id="setting-enter-threshold" min="0.3" max="1" step="0.05" value="0.70" />
+            <span id="setting-enter-threshold-value">0.70</span>
+          </div>
+          <div class="setting-row">
+            <label for="setting-exit-threshold">Blink threshold (return open)</label>
+            <input type="range" id="setting-exit-threshold" min="0.1" max="0.9" step="0.05" value="0.40" />
+            <span id="setting-exit-threshold-value">0.40</span>
+          </div>
+          <div class="setting-row">
+            <label for="setting-min-duration">Minimum blink duration (ms)</label>
+            <input type="range" id="setting-min-duration" min="0" max="300" step="10" value="50" />
+            <span id="setting-min-duration-value">50</span>
+          </div>
+          <div class="setting-row setting-toggle">
+            <label for="setting-show-camera">Show camera preview</label>
+            <input type="checkbox" id="setting-show-camera" checked />
+          </div>
+        </div>
+
+        <div class="settings-group">
+          <h2>Alerts</h2>
+          <div class="setting-row">
+            <label for="setting-stage1">Alert stage 1 (s)</label>
+            <input type="range" id="setting-stage1" min="3" max="30" step="1" value="8" />
+            <span id="setting-stage1-value">8</span>
+          </div>
+          <div class="setting-row">
+            <label for="setting-stage2">Alert stage 2 (s)</label>
+            <input type="range" id="setting-stage2" min="5" max="60" step="1" value="15" />
+            <span id="setting-stage2-value">15</span>
+          </div>
+          <div class="setting-row">
+            <label for="setting-stage3">Alert stage 3 (s)</label>
+            <input type="range" id="setting-stage3" min="10" max="90" step="1" value="25" />
+            <span id="setting-stage3-value">25</span>
+          </div>
+          <div class="setting-row">
+            <label for="setting-volume">Alert volume</label>
+            <input type="range" id="setting-volume" min="0" max="1" step="0.05" value="1" />
+            <span id="setting-volume-value">100%</span>
+          </div>
+        </div>
+
+        <button id="reset-defaults-button" type="button">Reset to defaults</button>
+      </section>
+      </main>
+
+      <dialog id="reset-confirm-dialog">
+        <p>Reset all settings to their defaults?</p>
+        <div class="dialog-actions">
+          <button id="reset-cancel-button" type="button">Cancel</button>
+          <button id="reset-confirm-button" type="button" class="danger">Reset</button>
+        </div>
+      </dialog>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

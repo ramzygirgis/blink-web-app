@@ -52,6 +52,12 @@ export class AlertScheduler {
     this.lastTriggerMs = null;
   }
 
+  setStages(stages: AlertStage[]): void {
+    this.stages = stages;
+    this.currentStageIndex = -1;
+    this.lastTriggerMs = null;
+  }
+
   private findStageIndex(msSinceLastBlink: number): number {
     for (let i = this.stages.length - 1; i >= 0; i--) {
       if (msSinceLastBlink >= this.stages[i].afterMs) return i;

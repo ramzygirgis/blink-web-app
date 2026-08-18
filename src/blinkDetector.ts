@@ -44,4 +44,13 @@ export class BlinkDetector {
   getState(): BlinkState {
     return this.state;
   }
+
+  setOptions(options: BlinkDetectorOptions): void {
+    this.options = options;
+  }
+
+  reset(): void {
+    this.state = "open";
+    this.closedSinceMs = null;
+  }
 }
