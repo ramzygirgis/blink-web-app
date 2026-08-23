@@ -5,6 +5,34 @@
     <link rel="icon" type="image/svg+xml" href="/blink-icon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Blink</title>
+    <meta
+      name="description"
+      content="Blink uses your webcam and on-device face tracking to detect blinks in real time, gently reminding you when you've gone too long without one."
+    />
+    <link rel="canonical" href="https://blinkmore.ca" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://blinkmore.ca" />
+    <meta property="og:title" content="Blink" />
+    <meta
+      property="og:description"
+      content="Blink uses your webcam and on-device face tracking to detect blinks in real time, gently reminding you when you've gone too long without one."
+    />
+    <meta property="og:image" content="https://blinkmore.ca/og-image.png" />
+    <meta property="og:image:secure_url" content="https://blinkmore.ca/og-image.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Blink — real-time blink detection in your browser" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Blink" />
+    <meta
+      name="twitter:description"
+      content="Blink uses your webcam and on-device face tracking to detect blinks in real time, gently reminding you when you've gone too long without one."
+    />
+    <meta name="twitter:image" content="https://blinkmore.ca/og-image.png" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -13,6 +41,21 @@
     />
   </head>
   <body>
+    <button id="help-button" type="button" aria-label="Limitations and tips">?</button>
+
+    <dialog id="help-dialog">
+      <h2>Before you rely on this</h2>
+      <ul>
+        <li>Glasses can interfere with eye tracking and reduce accuracy.</li>
+        <li>Only one face should be in frame — multiple faces can confuse detection.</li>
+        <li>Needs decent lighting — detection gets less reliable in dim or uneven light.</li>
+      </ul>
+      <p>Works best with one face, clearly lit, facing the camera, without glasses.</p>
+      <div class="dialog-actions">
+        <button id="help-close-button" type="button">Got it</button>
+      </div>
+    </dialog>
+
     <div id="app">
       <aside id="sidebar">
         <div id="logo">
@@ -69,8 +112,8 @@
           <h2>Blink Parameters</h2>
           <div class="setting-row setting-row-wide-value">
             <label for="setting-sensitivity">Blink sensitivity</label>
-            <input type="range" id="setting-sensitivity" min="0" max="100" step="1" value="50" />
-            <span id="setting-sensitivity-value">Mid</span>
+            <input type="range" id="setting-sensitivity" min="0" max="100" step="1" value="73" />
+            <span id="setting-sensitivity-value">High</span>
           </div>
           <div class="setting-row">
             <label for="setting-min-duration">Minimum blink duration (ms)</label>
@@ -87,8 +130,8 @@
           <h2>Alerts</h2>
           <div class="setting-row">
             <label for="setting-alert-delay">Alert delay (s)</label>
-            <input type="range" id="setting-alert-delay" min="3" max="15" step="1" value="8" />
-            <span id="setting-alert-delay-value">8</span>
+            <input type="range" id="setting-alert-delay" min="3" max="15" step="1" value="6" />
+            <span id="setting-alert-delay-value">6</span>
           </div>
           <div class="setting-row">
             <label for="setting-volume">Alert volume</label>

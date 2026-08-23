@@ -7,7 +7,7 @@ export interface BlinkDetectorOptions {
 }
 
 export const DEFAULT_BLINK_DETECTOR_OPTIONS: BlinkDetectorOptions = {
-  enterClosedThreshold: 0.70,
+  enterClosedThreshold: 0.654, // sensitivity 73 (midpoint of the "High" band)
   exitClosedThreshold: 0.45,
   minClosedDurationMs: 50,
 };

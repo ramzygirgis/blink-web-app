@@ -7,9 +7,9 @@ export interface AlertStage {
 }
 
 export const DEFAULT_ALERT_STAGES: AlertStage[] = [
-  { afterMs: 8_000, repeatIntervalMs: 4_000, beepCount: 1, frequencyHz: 600, volume: 0.15 },
-  { afterMs: 15_000, repeatIntervalMs: 2_500, beepCount: 2, frequencyHz: 750, volume: 0.25 },
-  { afterMs: 25_000, repeatIntervalMs: 1_200, beepCount: 3, frequencyHz: 900, volume: 0.35 },
+  { afterMs: 6_000, repeatIntervalMs: 4_000, beepCount: 1, frequencyHz: 600, volume: 0.15 },
+  { afterMs: 13_000, repeatIntervalMs: 2_500, beepCount: 2, frequencyHz: 750, volume: 0.25 },
+  { afterMs: 23_000, repeatIntervalMs: 1_200, beepCount: 3, frequencyHz: 900, volume: 0.35 },
 ];
 
 export class AlertScheduler {

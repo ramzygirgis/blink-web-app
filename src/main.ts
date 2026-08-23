@@ -34,6 +34,9 @@ const resetDefaultsButton = document.querySelector<HTMLButtonElement>("#reset-de
 const resetDialog = document.querySelector<HTMLDialogElement>("#reset-confirm-dialog")!;
 const resetCancelButton = document.querySelector<HTMLButtonElement>("#reset-cancel-button")!;
 const resetConfirmButton = document.querySelector<HTMLButtonElement>("#reset-confirm-button")!;
+const helpButton = document.querySelector<HTMLButtonElement>("#help-button")!;
+const helpDialog = document.querySelector<HTMLDialogElement>("#help-dialog")!;
+const helpCloseButton = document.querySelector<HTMLButtonElement>("#help-close-button")!;
 
 const blinkDetector = new BlinkDetector(DEFAULT_BLINK_DETECTOR_OPTIONS);
 const alertPlayer = new AlertPlayer();
@@ -129,6 +132,14 @@ resetConfirmButton.addEventListener("click", () => {
   videoEl.classList.remove("camera-hidden");
 
   resetDialog.close();
+});
+
+helpButton.addEventListener("click", () => {
+  helpDialog.showModal();
+});
+
+helpCloseButton.addEventListener("click", () => {
+  helpDialog.close();
 });
 
 async function startMonitoring() {
